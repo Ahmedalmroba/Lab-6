@@ -1,0 +1,38 @@
+
+                               markt model
+
+
+
+
+    @NotEmpty(message = "Product name cannot be empty")
+    private String productName;
+
+      Product name cannot be empty.
+
+
+    @NotNull(message = "Quantity cannot be null")
+    @PositiveOrZero(message = "Quantity must be a positive or zero value")
+    private int quantity;
+
+   Quantity cannot be null and Quantity must be a positive or zero value.
+
+
+
+
+    @NotNull(message = "Price cannot be null")
+    @DecimalMin(value = "0.0", message = "Price must be a positive value")
+
+
+    private double price;
+
+    Price cannot be null and and Price must be a positive value.
+
+
+
+
+
+   @NotEmpty(message = "status should be not empty")
+    @Pattern(regexp = ("valid | not valid")
+    private String status;
+	
+	status should be not empty an should be valid or not.
