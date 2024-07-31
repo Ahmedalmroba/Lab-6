@@ -74,6 +74,7 @@ public class EmployeeController {
         }
 
     }
+
     @GetMapping("/age-range/{minAge}/{maxAge}")
     public ResponseEntity getEmployeesByAgeRange(@PathVariable int minAge, @PathVariable int maxAge) {
 
@@ -92,43 +93,49 @@ public class EmployeeController {
     }
 
     @PostMapping("/apply-leave/{employeeId}")
-    public ResponseEntity applyLeave(@Valid @RequestBody String employeeId, Errors errors) {
-        if (errors.hasErrors()) {
-            String Message = errors.getFieldError().getDefaultMessage();
+    public ResponseEntity applyLeave(@PathVariable String employeeId) {
 
-            for (Employee employee : employees) {
-                if (employee.getId().equals(employeeId)) {
-                    if (employee == null) {
-                        return ResponseEntity.status(400).body("Employee not found");
-                    }
-                    if (employee.isOnLeave() || employee.getAnnualLeave() <= 0) {
-                        return ResponseEntity.status(400).body("Employee cannot apply for leave.");
-                    }
+        for (Employee employee : employees) {
+            if (employee.getId().equals(employeeId)) {
+
+                if (employee.isOnLeave() == false && employee.getAnnualLeave() > 0) {
+
 
                     employee.setOnLeave(true);
                     employee.setAnnualLeave(employee.getAnnualLeave() - 1);
+                    return ResponseEntity.status(200).body("Employee  apply for leave.");
+
                 }
+
             }
-            return ResponseEntity.status(400).body("Employee cannot apply for leave.");
         }
-         return  ResponseEntity.status(400).body("Employee cannot apply for leave.");
+        return ResponseEntity.status(400).body("Employee cannot apply for leave.");
     }
-        @GetMapping("/no-annual-leave")
-        public ResponseEntity getEmployeesWithNoAnnualLeave() {
 
-    for (Employee employee : employees) {
-        if (employee.getAnnualLeave() <= 0) {
-            employees.add(employee);
+    @GetMapping("/no-annual-leave")
+    public ResponseEntity getEmployeesWithNoAnnualLeave() {
+
+        for (Employee employee : employees) {
+            if (employee.getAnnualLeave() <= 0) {
+                employees.add(employee);
+            }
         }
+        return ResponseEntity.status(200).body(employees);
     }
-    return ResponseEntity.status(200).body(employees);
-}
-    @PutMapping("/promote/{employeeId}")
-    public ResponseEntity promoteEmployee(@Valid @RequestBody String employeeId ,Errors errors ) {
 
-        if (errors.hasErrors()) {
-            String Message = errors.getFieldError().getDefaultMessage();
+    @PutMapping("/promote/{employeeId}/{ids}")
+    public ResponseEntity promoteEmployee(@PathVariable String employeeId, @PathVariable String ids) {
 
+        Employee supervisor = null;
+        for (Employee employee : employees) {
+            if (employee.getId().equals(ids)) {
+                supervisor = employee;
+                break;
+            }
+        }
+        if (supervisor == null) {
+            return ResponseEntity.status(400).body("supervisor not found");
+        }
         Employee employeeToPromote = null;
         for (Employee employee : employees) {
             if (employee.getId().equals(employeeId)) {
@@ -137,19 +144,20 @@ public class EmployeeController {
             }
         }
 
+
         if (employeeToPromote == null) {
-            return ResponseEntity.status(200).body(employeeToPromote);
+            return ResponseEntity.status(400).body("employeeToPromote not found");
         }
         if (employeeToPromote.getAge() >= 30 && !employeeToPromote.isOnLeave()) {
             employeeToPromote.setPosition("supervisor");
-        } else {
-            return ResponseEntity.status(400).body(new Api("Employee does not meet criteria for promotion."));
-        }}
-
-        return ResponseEntity.status(200).body(new Api("Employee promoted successfully"));
-        }}
+            return ResponseEntity.status(200).body("employeeToPromote");
+        }
+        return ResponseEntity.status(400).body("not valid");
 
 
+    }
+
+}
 
 
 
